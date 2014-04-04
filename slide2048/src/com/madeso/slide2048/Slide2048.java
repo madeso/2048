@@ -35,6 +35,8 @@ public class Slide2048 implements ApplicationListener {
 	Color gameBackground = new Color(0xBBADA0FF);
 
 	float gameScale = 0.9f;
+	int totalTiles = 4;
+	float Factor = 106.25f / 15.0f; 
 	
 	@Override
 	public void render() {		
@@ -46,11 +48,27 @@ public class Slide2048 implements ApplicationListener {
 		
 		float w = camera.viewportWidth;
 		float h = camera.viewportHeight;
-		
 		float size = Math.min(h, w)*gameScale;
 		
+		float spacing = size / ( 1 + Factor*totalTiles + totalTiles );
+		float tileSize = spacing * Factor;
+		
 		batch.setColor(gameBackground);
-		batch.rect((w-size)/2.0f-w/2, (h-size)/2 - h/2, size, size);
+		
+		float boardx = (w-size)/2.0f-w/2; 
+		float boardy = (h-size)/2 - h/2;
+		batch.rect(boardx, boardy, size, size);
+		
+		int value = 0;
+		
+		DoubleColor dc = DoubleColor.FromValue(value);
+		batch.setColor( dc.background );
+		
+		for(int x=0; x<totalTiles; ++x) {
+			for(int y=0; y<totalTiles; ++y) {
+				batch.rect(boardx + spacing + (tileSize + spacing)*x, boardy + spacing + (tileSize + spacing)*y, tileSize, tileSize);
+			}
+		}
 		
 		batch.end();
 	}
