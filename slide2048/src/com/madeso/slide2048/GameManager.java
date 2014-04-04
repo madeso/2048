@@ -146,9 +146,9 @@ class GameManager {
 
 	/** 
 	 * Move tiles on the grid in the specified direction.
-	 * @param direction 0: up, 1: right, 2: down, 3: left
+	 * @param input the input
 	 */
-	public void move(int direction) {
+	public void move(Input input) {
 	  GameManager self = this;
 
 	  if (this.isGameTerminated()) return; // Don't do anything if the game's over
@@ -156,7 +156,7 @@ class GameManager {
 	  Tile tile;
 	  Vec cell;
 
-	  Vec vector = this.getVector(direction);
+	  Vec vector = this.getVector(input);
 	  Traversals traversals = this.buildTraversals(vector);
 	  boolean moved = false;
 
@@ -211,12 +211,12 @@ class GameManager {
 	}
 
 	// Get the vector representing the chosen direction
-	Vec getVector(int direction) {
+	Vec getVector(Input input) {
 	  // Vectors representing tile movement
-		if (direction==0) return new Vec( 0, 1); // Up
-		if (direction==1) return new Vec( 1, 0); // Right
-		if (direction==2) return new Vec( 0,-1); // Down
-		if (direction==3) return new Vec(-1, 0); // Left
+		if (input==Input.up) return new Vec( 0, 1); // Up
+		if (input==Input.right) return new Vec( 1, 0); // Right
+		if (input==Input.down) return new Vec( 0,-1); // Down
+		if (input==Input.left) return new Vec(-1, 0); // Left
 	  return null;
 	}
 
@@ -276,7 +276,7 @@ class GameManager {
 
 		  if (tile!=null) {
 			for (int direction = 0; direction < 4; direction++) {
-			  Vec vector = self.getVector(direction);
+			  Vec vector = self.getVector(getIntDiretion(direction));
 			  Vec cell = new Vec(x + vector.getX(), y + vector.getY());
 
 			  Tile other = self.grid.cellContent(cell);
@@ -290,6 +290,13 @@ class GameManager {
 	  }
 
 	  return false;
+	}
+
+	private Input getIntDiretion(int input) {
+		if (input== 0) return Input.up;
+		if (input== 1) return Input.right;
+		if (input== 2) return Input.down ;
+		return Input.left;
 	}
 
 	boolean positionsEqual(Vec first, Vec second) {

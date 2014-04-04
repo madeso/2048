@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector3;
 
 public class Slide2048 implements ApplicationListener {
 	private OrthographicCamera camera;
@@ -41,13 +42,11 @@ public class Slide2048 implements ApplicationListener {
 	Color gameBackground = new Color(0xBBADA0FF);
 	
 	Constants constants = new Constants();
+	private boolean touchdown;
+	private Vector3 touchpos;
 	
 	@Override
 	public void render() {
-		if(Gdx.input.justTouched()) {
-			gameManager.move(0);
-		}
-		
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -73,8 +72,67 @@ public class Slide2048 implements ApplicationListener {
 				}
 			}
 		} );
-		
 		batch.end();
+		
+		float diff = 0.04f;
+		
+		if (Gdx.input.isTouched(0)) {
+			if (touchdown == false) {
+				touchdown = true;
+				touchpos = getTouchPosScreen();
+			}
+
+			Vector3 rtouchPos = new Vector3(touchpos);
+
+			Vector3 newTouchPos = getTouchPosScreen();
+			Vector3 dist = newTouchPos.sub(touchpos);
+			dist.y = -dist.y;
+
+			dist = dist.scl(1.0f / diff);
+
+			int dir = Maths.Classify(dist.x, dist.y);
+		
+	} else {
+		if (touchdown) {
+			touchdown = false;
+			Vector3 newTouchPos = getTouchPosScreen();
+			Vector3 dist = newTouchPos.sub(touchpos);
+			dist.y = -dist.y;
+			float d = dist.len();
+
+			dist = dist.scl(1.0f / diff);
+
+			int dir = Maths.Classify(dist.x, dist.y);
+
+			switch (dir) {
+				case 5:
+				//game.input(Game.Input.tap);
+				break;
+				case 4:
+					gameManager.move(Input.left);
+				break;
+				case 6:
+					gameManager.move(Input.right);
+				break;
+				case 8:
+					gameManager.move(Input.up);
+				break;
+				case 2:
+				gameManager.move(Input.down);
+				break;
+			}
+
+			if (d > 1.0f) {
+			}
+		}
+	}
+	}
+	
+	private Vector3 getTouchPosScreen() {
+		Vector3 touchPos = new Vector3();
+		touchPos.set(Gdx.input.getX(0), Gdx.input.getY(0), 0);
+		camera.unproject(touchPos);
+		return touchPos;
 	}
 	
 	private void drawTile(float x, float y, int value) {
