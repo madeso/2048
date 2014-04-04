@@ -51,18 +51,22 @@ public class Slide2048 implements ApplicationListener {
 		
 		int value = 0;
 		
-		DoubleColor dc = DoubleColor.FromValue(value);
-		batch.setColor( dc.background );
-		
 		for(int x=0; x<constants.totalTiles; ++x) {
 			for(int y=0; y<constants.totalTiles; ++y) {
-				batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x,
-						constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y,
-						constants.tileSize, constants.tileSize);
+				drawTile(x, y, value);
 			}
 		}
 		
 		batch.end();
+	}
+	
+	private void drawTile(float x, float y, int value) {
+		DoubleColor dc = DoubleColor.FromValue(value);
+		batch.setColor( dc.background );
+		
+		batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x,
+				constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y,
+				constants.tileSize, constants.tileSize);
 	}
 
 	@Override
