@@ -2,6 +2,7 @@ package com.madeso.slide2048;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -17,6 +18,8 @@ public class Slide2048 implements ApplicationListener {
 	private OrthographicCamera camera;
 	private ShapeRenderer batch;
 	
+	GameManager gameManager;
+	
 	@Override
 	public void create() {		
 		float w = Gdx.graphics.getWidth();
@@ -24,6 +27,9 @@ public class Slide2048 implements ApplicationListener {
 		
 		camera = new OrthographicCamera(1, h/w);
 		batch = new ShapeRenderer();
+		constants.update(camera);
+		
+		gameManager = new GameManager(constants.totalTiles);
 	}
 
 	@Override
@@ -37,7 +43,11 @@ public class Slide2048 implements ApplicationListener {
 	Constants constants = new Constants();
 	
 	@Override
-	public void render() {		
+	public void render() {
+		if(Gdx.input.justTouched()) {
+			gameManager.move(0);
+		}
+		
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
@@ -49,13 +59,20 @@ public class Slide2048 implements ApplicationListener {
 		batch.setColor(gameBackground);
 		batch.rect(constants.boardx, constants.boardy, constants.size, constants.size);
 		
-		int value = 0;
-		
 		for(int x=0; x<constants.totalTiles; ++x) {
 			for(int y=0; y<constants.totalTiles; ++y) {
-				drawTile(x, y, value);
+				drawTile(x, y, 0);
 			}
 		}
+		
+		gameManager.getActuator().getGrid().eachCell(new CellCallBack() {
+			@Override
+			public void onCell(int x, int y, Tile tile) {
+				if( tile != null ) {
+					drawTile(x, y, tile.getValue() );
+				}
+			}
+		} );
 		
 		batch.end();
 	}

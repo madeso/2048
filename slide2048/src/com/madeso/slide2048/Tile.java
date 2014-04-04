@@ -4,7 +4,7 @@ class Tile {
 	private int x;
 	private int y;
 	private Vec previousPosition;
-	private Tile mergedFrom; // Tracks tiles that merged together
+	private MergedFrom mergedFrom; // Tracks tiles that merged together
 	private int value;
 	
 	public Tile(Vec position, int value) {
@@ -43,5 +43,14 @@ class Tile {
 
 	public int getY() {
 		return y;
+	}
+
+	public void setMergedFrom(MergedFrom mergedFrom) {
+		this.mergedFrom = mergedFrom;
+	}
+
+	public MergedFrom getMergedFrom() {
+		// TODO Auto-generated method stub
+		return mergedFrom;
 	}
 }
