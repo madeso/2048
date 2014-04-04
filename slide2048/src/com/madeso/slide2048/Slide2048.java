@@ -33,10 +33,8 @@ public class Slide2048 implements ApplicationListener {
 	
 	Color background = new Color(0xFAF8EFFF);
 	Color gameBackground = new Color(0xBBADA0FF);
-
-	float gameScale = 0.9f;
-	int totalTiles = 4;
-	float Factor = 106.25f / 15.0f; 
+	
+	Constants constants = new Constants();
 	
 	@Override
 	public void render() {		
@@ -46,27 +44,21 @@ public class Slide2048 implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 		batch.begin(ShapeType.Filled);
 		
-		float w = camera.viewportWidth;
-		float h = camera.viewportHeight;
-		float size = Math.min(h, w)*gameScale;
-		
-		float spacing = size / ( 1 + Factor*totalTiles + totalTiles );
-		float tileSize = spacing * Factor;
+		constants.update(camera);
 		
 		batch.setColor(gameBackground);
-		
-		float boardx = (w-size)/2.0f-w/2; 
-		float boardy = (h-size)/2 - h/2;
-		batch.rect(boardx, boardy, size, size);
+		batch.rect(constants.boardx, constants.boardy, constants.size, constants.size);
 		
 		int value = 0;
 		
 		DoubleColor dc = DoubleColor.FromValue(value);
 		batch.setColor( dc.background );
 		
-		for(int x=0; x<totalTiles; ++x) {
-			for(int y=0; y<totalTiles; ++y) {
-				batch.rect(boardx + spacing + (tileSize + spacing)*x, boardy + spacing + (tileSize + spacing)*y, tileSize, tileSize);
+		for(int x=0; x<constants.totalTiles; ++x) {
+			for(int y=0; y<constants.totalTiles; ++y) {
+				batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x,
+						constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y,
+						constants.tileSize, constants.tileSize);
 			}
 		}
 		
