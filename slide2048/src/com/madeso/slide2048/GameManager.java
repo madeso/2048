@@ -1,7 +1,5 @@
 package com.madeso.slide2048;
 
-import com.badlogic.gdx.Gdx;
-
 class GameManager {
 	int size;
 	int startTiles;
@@ -167,12 +165,13 @@ class GameManager {
 
 	  // Traverse the grid in the right direction and move tiles
 	  for(int x=0; x<traversals.x.length; ++x) {
-		  for(int y=0; x<traversals.y.length; ++y) {
+		  for(int y=0; y<traversals.y.length; ++y) {
 		  cell = new Vec(x, y );
 		  tile = self.grid.cellContent(cell);
 
 		  if (tile != null) {
 			FarthestPosition positions = self.findFarthestPosition(cell, vector);
+
 			Tile next = self.grid.cellContent(positions.getNext());
 
 			// Only one merger per row traversal?
@@ -204,11 +203,9 @@ class GameManager {
 
 	  if (moved) {
 		this.addRandomTile();
-
 		if (!this.movesAvailable()) {
 		  this.over = true; // Game over!
 		}
-
 		this.actuate();
 	  }
 	}
@@ -216,10 +213,10 @@ class GameManager {
 	// Get the vector representing the chosen direction
 	Vec getVector(int direction) {
 	  // Vectors representing tile movement
-		if (direction==0) return new Vec(0,-1); // Up
-		if (direction==1) return new Vec(1, 0); // Right
-		if (direction==2) return new Vec(0, 1); // Down
-		if (direction==3) return new Vec(1, 0); // Left
+		if (direction==0) return new Vec( 0, 1); // Up
+		if (direction==1) return new Vec( 1, 0); // Right
+		if (direction==2) return new Vec( 0,-1); // Down
+		if (direction==3) return new Vec(-1, 0); // Left
 	  return null;
 	}
 
@@ -234,7 +231,7 @@ class GameManager {
 
 	  // Always traverse from the farthest cell in the chosen direction
 	  if (vector.getX() == 1) traversals.x = Reverse(traversals.x);
-	  if (vector.getY() == 1) traversals.y = Reverse(traversals.y);
+	  if (vector.getY() == -1) traversals.y = Reverse(traversals.y);
 
 	  return traversals;
 	}
@@ -244,7 +241,7 @@ class GameManager {
 		for(int i=0; i<a.length; ++i) {
 			ret[i] = a[ a.length - (i + 1) ];
 		}
-		return null;
+		return ret;
 	}
 
 	FarthestPosition findFarthestPosition(Vec cell, Vec vector) {
