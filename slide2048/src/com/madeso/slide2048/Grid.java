@@ -55,6 +55,17 @@ class Grid {
 
 	  return cells;
 	}
+	
+	public void update(final float dt) {
+		eachCell(new CellCallBack() {
+			@Override
+			public void onCell(int x, int y, Tile tile) {
+				if( tile != null ) {
+					tile.update(dt);
+				}
+			}
+		});
+	}
 
 	// Call callback for every cell
 	void eachCell(CellCallBack callback) {

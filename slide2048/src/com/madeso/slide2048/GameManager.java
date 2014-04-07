@@ -85,6 +85,7 @@ class GameManager {
 	  if (this.grid.cellsAvailable()) {
 		int value = Math.random() < 0.9 ? 2 : 4;
 		Tile tile = new Tile(this.grid.randomAvailableCell(), value);
+		tile.wobble();
 
 		this.grid.insertTile(tile);
 	  }
@@ -170,7 +171,7 @@ class GameManager {
 		  tile = self.grid.cellContent(cell);
 
 		  if (tile != null) {
-			FarthestPosition positions = self.findFarthestPosition(cell, vector);
+			FarthestPosition positions = GameManager.findFarthestPosition(self.grid, cell, vector);
 
 			Tile next = self.grid.cellContent(positions.getNext());
 
@@ -230,8 +231,8 @@ class GameManager {
 	  }
 
 	  // Always traverse from the farthest cell in the chosen direction
-	  if (vector.getX() == 1) traversals.x = Reverse(traversals.x);
-	  if (vector.getY() == -1) traversals.y = Reverse(traversals.y);
+	  if (vector.getX() == -1) traversals.x = Reverse(traversals.x);
+	  if (vector.getY() == 1) traversals.y = Reverse(traversals.y);
 
 	  return traversals;
 	}
@@ -244,15 +245,15 @@ class GameManager {
 		return ret;
 	}
 
-	FarthestPosition findFarthestPosition(Vec cell, Vec vector) {
+	static FarthestPosition findFarthestPosition(Grid grid, Vec cell, Vec vector) {
 	  Vec previous;
 
 	  // Progress towards the vector direction until an obstacle is found
 	  do {
 		previous = cell;
 		cell = new Vec(previous.getX() + vector.getX(), previous.getY() + vector.getY());
-	  } while (this.grid.withinBounds(cell) &&
-			   this.grid.cellAvailable(cell));
+	  } while (grid.withinBounds(cell) &&
+			   grid.cellAvailable(cell));
 
 	  return new FarthestPosition(
 		previous,
@@ -301,5 +302,9 @@ class GameManager {
 
 	boolean positionsEqual(Vec first, Vec second) {
 	  return first.getX() == second.getX() && first.getY() == second.getY();
+	}
+
+	public void update(float deltaTime) {
+		grid.update(deltaTime);
 	}
 }

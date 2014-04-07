@@ -61,6 +61,8 @@ public class Slide2048 implements ApplicationListener {
 		Gdx.gl.glClearColor(background.r, background.g, background.b, background.a);
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
+		gameManager.update(Gdx.graphics.getDeltaTime());
+		
 		batch.setProjectionMatrix(camera.combined);
 		float aspect = constants.h / constants.w;
 		Matrix4 normalProjection = new Matrix4().setToOrtho2D(
@@ -77,7 +79,7 @@ public class Slide2048 implements ApplicationListener {
 		
 		for(int x=0; x<constants.totalTiles; ++x) {
 			for(int y=0; y<constants.totalTiles; ++y) {
-				drawTile(x, y, 0);
+				drawTile(x, y, 0, 1.0f);
 			}
 		}
 		
@@ -85,7 +87,7 @@ public class Slide2048 implements ApplicationListener {
 			@Override
 			public void onCell(int x, int y, Tile tile) {
 				if( tile != null ) {
-					drawTile(x, y, tile.getValue() );
+					drawTile(x, y, tile.getValue(), tile.getWobbleTimer() );
 				}
 			}
 		} );
@@ -166,13 +168,16 @@ public class Slide2048 implements ApplicationListener {
 		return touchPos;
 	}
 	
-	private void drawTile(float x, float y, int value) {
+	private void drawTile(float x, float y, int value, float size) {
 		DoubleColor dc = DoubleColor.FromValue(value);
 		batch.setColor( dc.background );
 		
-		batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x,
-				constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y,
-				constants.tileSize, constants.tileSize);
+		float s = constants.tileSize * size;
+		float s2 = s/2-constants.tileSize/2;
+		
+		batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x-s2,
+				constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y-s2,
+				s, s);
 	}
 	
 	private void drawText(float x, float y, int value) {

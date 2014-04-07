@@ -6,6 +6,7 @@ class Tile {
 	private Vec previousPosition;
 	private MergedFrom mergedFrom; // Tracks tiles that merged together
 	private int value;
+	private float wobbleTimer;
 	
 	public Tile(Vec position, int value) {
 		this.x = position.getX();
@@ -14,6 +15,7 @@ class Tile {
 
 		this.previousPosition = null;
 		this.mergedFrom = null;
+		this.wobbleTimer = 1.0f;
 	}
 	
 	public Tile(Vec position) {
@@ -52,5 +54,19 @@ class Tile {
 	public MergedFrom getMergedFrom() {
 		// TODO Auto-generated method stub
 		return mergedFrom;
+	}
+
+	public void wobble() {
+		wobbleTimer = 0.0f;
+	}
+	
+	public void update(float dt) {
+		if( wobbleTimer < 1.0f ) {
+			wobbleTimer = wobbleTimer += dt;
+		}
+	}
+
+	public float getWobbleTimer() {
+		return wobbleTimer;
 	}
 }
