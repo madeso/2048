@@ -25,12 +25,25 @@ class Grid {
 		for (int y = 0; y < this.size; y++) {
 		  Tile tile = state[x][y];
 		  if( tile!=null ) {
-			cells[x][y] = new Tile(tile.getPosition(), tile.getValue());
+			  Tile cell = new Tile(tile.getPosition(), tile.getValue());
+			  cell.index = tile.index;
+			  cells[x][y] = cell;
 		  }
 		}
 	  }
 
 	  return cells;
+	}
+	
+	public void initIndex() {
+		int index = 0;
+		for (int x = 0; x < this.size; x++) {
+			for (int y = 0; y < this.size; y++) {
+			  Tile tile = this.cells[x][y];
+			  tile.index = index;
+			  ++index;
+			}
+		  }
 	}
 
 	// Find the first available random position
@@ -110,5 +123,20 @@ class Grid {
 	boolean withinBounds(Vec position) {
 	  return position.getX() >= 0 && position.getX() < this.size &&
 			 position.getY() >= 0 && position.getY() < this.size;
+	}
+
+	public Grid makeCopy() {
+		return new Grid(this.size, this.cells);
+	}
+
+	public Tile findIndex(final int index) {
+		for (int x = 0; x < this.size; x++) {
+			for (int y = 0; y < this.size; y++) {
+				Tile tile = this.cells[x][y];
+				if (tile.index == index)
+					return tile;
+			}
+		}
+		return null;
 	}
 }

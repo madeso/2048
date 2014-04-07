@@ -256,6 +256,26 @@ class GameManager {
 			}
 		}
 	}
+	
+	public void setupMovement(Input input) {
+		this.grid.initIndex();
+		final Grid next = this.grid.makeCopy();
+		this.grid.eachCell(new CellCallBack() {
+			@Override
+			public void onCell(int x, int y, Tile tile) {
+				if( tile != null ) {
+					Tile future = next.findIndex(tile.index);
+					if( future != null ) {
+						tile.setTarget( future.getPosition(), 1.0f );
+					}
+					else {
+						tile.setTarget(tile.getPosition(), 0.0f);
+					}
+				}
+			}
+		});
+		
+	}
 
 	// Get the vector representing the chosen direction
 	static Vec getVector(Input input) {

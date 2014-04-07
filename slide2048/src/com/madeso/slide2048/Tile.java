@@ -7,6 +7,7 @@ class Tile {
 	private MergedFrom mergedFrom; // Tracks tiles that merged together
 	private int value;
 	private float wobbleTimer;
+	protected int index = -1;
 	
 	public Tile(Vec position, int value) {
 		this.x = position.getX();
@@ -68,5 +69,12 @@ class Tile {
 
 	public float getWobbleTimer() {
 		return wobbleTimer;
+	}
+
+	Vec targetPosition;
+	float targetAlpha;
+	public void setTarget(Vec position, float f) {
+		targetPosition = position;
+		targetAlpha = f;
 	}
 }
