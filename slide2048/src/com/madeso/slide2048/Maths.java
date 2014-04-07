@@ -5,10 +5,16 @@ import com.badlogic.gdx.math.Vector2;
 public class Maths {
 	private final static float X = (float) (1.0f / Math.sqrt(2.0f));
 	public static final float LIM = 0.1f;
-
+	
 	public static int Classify(float dx, float dy) {
-		if (Math.sqrt(dx * dx + dy * dy) <= LIM) {
-			return 5;
+		return SubClassify(dx, dy, true);
+	}
+
+	public static int SubClassify(float dx, float dy, boolean want5) {
+		if( want5 ) {
+			if (Math.sqrt(dx * dx + dy * dy) <= LIM) {
+				return 5;
+			}
 		}
 
 		// TODO add more directions

@@ -40,8 +40,10 @@ class Grid {
 		for (int x = 0; x < this.size; x++) {
 			for (int y = 0; y < this.size; y++) {
 			  Tile tile = this.cells[x][y];
-			  tile.index = index;
-			  ++index;
+			  if( tile != null ) {
+				  tile.index = index;
+				  ++index;
+			  }
 			}
 		  }
 	}
@@ -133,8 +135,10 @@ class Grid {
 		for (int x = 0; x < this.size; x++) {
 			for (int y = 0; y < this.size; y++) {
 				Tile tile = this.cells[x][y];
-				if (tile.index == index)
-					return tile;
+				if( tile != null ) {
+					if (tile.index == index)
+						return tile;
+				}
 			}
 		}
 		return null;
