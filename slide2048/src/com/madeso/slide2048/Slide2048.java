@@ -135,6 +135,9 @@ public class Slide2048 implements ApplicationListener {
 			switch (dir) {
 				case 5:
 				//game.input(Game.Input.tap);
+					if( gameManager.getActuator().isGameTerminated() ) {
+						gameManager.restart();
+					}
 				break;
 				case 4:
 					gameManager.move(Input.left);
