@@ -313,7 +313,7 @@ class GameManager {
 		}
 
 		// Always traverse from the farthest cell in the chosen direction
-		if (vector.getX() == -1)
+		if (vector.getX() == 1)
 			traversals.x = Reverse(traversals.x);
 		if (vector.getY() == 1)
 			traversals.y = Reverse(traversals.y);
