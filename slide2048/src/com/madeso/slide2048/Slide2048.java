@@ -8,16 +8,21 @@ import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
 public class Slide2048 implements ApplicationListener {
 	private OrthographicCamera camera;
 	private ShapeRenderer batch;
+	
+	SpriteBatch fontBatch;
+    BitmapFont font;
 	
 	GameManager gameManager;
 	
@@ -25,6 +30,10 @@ public class Slide2048 implements ApplicationListener {
 	public void create() {		
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
+		
+
+	    fontBatch = new SpriteBatch();
+	    font = new BitmapFont();
 		
 		camera = new OrthographicCamera(1, h/w);
 		batch = new ShapeRenderer();
@@ -51,6 +60,12 @@ public class Slide2048 implements ApplicationListener {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);
+		// Matrix4 normalProjection = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth()/2, -Gdx.graphics.getHeight()/2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		/*Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth(), Gdx.graphics.getWidth(),
+				-Gdx.graphics.getHeight(), Gdx.graphics.getHeight(),
+				0, 1);*/
+		fontBatch.setProjectionMatrix(normalProjection);
 		batch.begin(ShapeType.Filled);
 		
 		constants.update(camera);
@@ -73,6 +88,18 @@ public class Slide2048 implements ApplicationListener {
 			}
 		} );
 		batch.end();
+		
+		fontBatch.begin();
+		gameManager.getActuator().getGrid().eachCell(new CellCallBack() {
+			@Override
+			public void onCell(int x, int y, Tile tile) {
+				if( tile != null ) {
+					drawText(x, y, tile.getValue() );
+				}
+			}
+		} );
+		batch.end();
+        fontBatch.end();
 		
 		float diff = 0.04f;
 		
@@ -142,6 +169,18 @@ public class Slide2048 implements ApplicationListener {
 		batch.rect(constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x,
 				constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y,
 				constants.tileSize, constants.tileSize);
+	}
+	
+	private void drawText(float x, float y, int value) {
+		String v = Integer.toString(value);
+		DoubleColor dc = DoubleColor.FromValue(value);
+		font.setScale(2);
+		float s = font.getScaleX();
+		// fontBatch.setColor( dc.font );
+		fontBatch.setColor(Color.BLUE);
+		float xbase = constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x;
+		float ybase = constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y;
+        font.draw(fontBatch, v, xbase*Gdx.graphics.getWidth(), ybase*Gdx.graphics.getHeight());
 	}
 
 	@Override
