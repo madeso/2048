@@ -80,7 +80,7 @@ public class Slide2048 implements ApplicationListener {
 
 			dist = dist.scl(1.0f / diff);
 			
-			float d = (float) (Math.sqrt(dist.x * dist.x + dist.y * dist.y) / Maths.LIM);
+			float d = (float) (Math.sqrt(dist.x * dist.x + dist.y * dist.y) / 10.0f );
 
 			int dir = Maths.SubClassify(dist.x, dist.y, false);
 

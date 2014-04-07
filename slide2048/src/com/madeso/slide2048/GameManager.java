@@ -1,5 +1,7 @@
 package com.madeso.slide2048;
 
+import com.badlogic.gdx.Gdx;
+
 class GameManager {
 	int size;
 	int startTiles;
@@ -260,6 +262,7 @@ class GameManager {
 	public void setupMovement(Input input) {
 		this.grid.initIndex();
 		final Grid next = this.grid.makeCopy();
+		calcMove(input, next);
 		this.grid.eachCell(new CellCallBack() {
 			@Override
 			public void onCell(int x, int y, Tile tile) {
