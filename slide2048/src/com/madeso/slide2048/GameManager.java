@@ -245,6 +245,7 @@ class GameManager {
 						Tile merged = new Tile(positions.getNext(),
 								tile.getValue() * 2);
 						merged.setMergedFrom(new MergedFrom(tile, next));
+						merged.index = next.index;
 
 						grid.insertTile(merged);
 						grid.removeTile(tile);
@@ -261,6 +262,7 @@ class GameManager {
 	
 	public void setupMovement(Input input) {
 		this.grid.initIndex();
+		final Grid self = this.grid;
 		final Grid next = this.grid.makeCopy();
 		calcMove(input, next);
 		this.grid.eachCell(new CellCallBack() {
@@ -270,9 +272,16 @@ class GameManager {
 					Tile future = next.findIndex(tile.index);
 					if( future != null ) {
 						tile.setTarget( future.getPosition(), 1.0f );
-					}
-					else {
-						tile.setTarget(tile.getPosition(), 0.0f);
+						MergedFrom merged = future.getMergedFrom();
+						if( merged != null ) {
+							Tile removedTile = self.findIndex(merged.removedTile.index);
+							if( removedTile == null ) {
+								Gdx.app.log("", String.format("Trying to remove %d", merged.oldTile.index));
+							}
+							else {
+								removedTile.setTarget(future.getPosition(), 0.0f);
+							}
+						}
 					}
 				}
 			}

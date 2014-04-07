@@ -170,7 +170,7 @@ public class Slide2048 implements ApplicationListener {
 
 		for (int x = 0; x < constants.totalTiles; ++x) {
 			for (int y = 0; y < constants.totalTiles; ++y) {
-				drawTile(x, y, 0, 1.0f);
+				drawTile(x, y, 0, 1.0f, 1.0f);
 			}
 		}
 
@@ -180,11 +180,13 @@ public class Slide2048 implements ApplicationListener {
 				if (tile != null) {
 					float tx = x;
 					float ty = y;
-					if( renderInput ) {
+					float a = 1.0f;
+					if( renderInput && tile.targetPosition != null) {
 						tx = Quart.easeOut( movementData, tx, tile.targetPosition.getX()-x, 1);
 						ty = Quart.easeOut( movementData, ty, tile.targetPosition.getY()-y, 1);
+						a = tile.targetAlpha;
 					}
-					drawTile(tx, ty, tile.getValue(),
+					drawTile(tx, ty, tile.getValue(), a, 
 							Elastic.easeOut(tile.getWobbleTimer(), 0, 1, 1));
 				}
 			}
@@ -196,7 +198,15 @@ public class Slide2048 implements ApplicationListener {
 			@Override
 			public void onCell(int x, int y, Tile tile) {
 				if (tile != null) {
-					drawText(x, y, tile.getValue());
+					float tx = x;
+					float ty = y;
+					float a = 1.0f;
+					if( renderInput && tile.targetPosition != null ) {
+						tx = Quart.easeOut( movementData, tx, tile.targetPosition.getX()-x, 1);
+						ty = Quart.easeOut( movementData, ty, tile.targetPosition.getY()-y, 1);
+						a = tile.targetAlpha;
+					}
+					drawText(tx, ty, tile.getValue(), a);
 				}
 			}
 		});
@@ -210,9 +220,10 @@ public class Slide2048 implements ApplicationListener {
 		return touchPos;
 	}
 
-	private void drawTile(float x, float y, int value, float size) {
+	private void drawTile(float x, float y, int value, float alpha, float size) {
 		DoubleColor dc = DoubleColor.FromValue(value);
-		batch.setColor(dc.background);
+		Color c = dc.background;
+		batch.setColor(c.r, c. g, c.b, alpha);
 
 		float s = constants.tileSize * size;
 		float s2 = s / 2 - constants.tileSize / 2;
@@ -224,12 +235,13 @@ public class Slide2048 implements ApplicationListener {
 				s);
 	}
 
-	private void drawText(float x, float y, int value) {
+	private void drawText(float x, float y, int value, float alpha) {
 		String v = Integer.toString(value);
 		DoubleColor dc = DoubleColor.FromValue(value);
 		font.setScale(2);
 		TextBounds bounds = font.getBounds(v);
-		fontBatch.setColor(dc.font);
+		Color c = dc.font;
+		fontBatch.setColor(c.r, c. g, c.b, alpha);
 		float xbase = constants.boardx + constants.spacing
 				+ (constants.tileSize + constants.spacing) * x
 				+ constants.tileSize / 2;
