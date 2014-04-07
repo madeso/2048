@@ -166,8 +166,10 @@ class GameManager {
 		GameManager.prepareTiles(this.grid);
 
 		// Traverse the grid in the right direction and move tiles
-		for (int x = 0; x < traversals.x.length; ++x) {
-			for (int y = 0; y < traversals.y.length; ++y) {
+		for (int ix = 0; ix < traversals.x.length; ++ix) {
+			for (int iy = 0; iy < traversals.y.length; ++iy) {
+				int x = traversals.x[ix];
+				int y = traversals.x[iy];
 				cell = new Vec(x, y);
 				tile = self.grid.cellContent(cell);
 
