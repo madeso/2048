@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -61,11 +62,10 @@ public class Slide2048 implements ApplicationListener {
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
 		
 		batch.setProjectionMatrix(camera.combined);
-		// Matrix4 normalProjection = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth()/2, -Gdx.graphics.getHeight()/2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		/*Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth()/2, Gdx.graphics.getWidth()/2,
-				-Gdx.graphics.getHeight()/2, Gdx.graphics.getHeight()/2,
-				0, 1);*/
+		float aspect = constants.h / constants.w;
+		Matrix4 normalProjection = new Matrix4().setToOrtho2D(
+				-Gdx.graphics.getWidth()/2, -(Gdx.graphics.getHeight()*aspect/2),
+				Gdx.graphics.getWidth(), Gdx.graphics.getHeight()*aspect);
 		fontBatch.setProjectionMatrix(normalProjection);
 		// fontBatch.setProjectionMatrix(camera.combined);
 		batch.begin(ShapeType.Filled);
@@ -174,15 +174,13 @@ public class Slide2048 implements ApplicationListener {
 	
 	private void drawText(float x, float y, int value) {
 		String v = Integer.toString(value);
-		// DoubleColor dc = DoubleColor.FromValue(value);
-		// font.setScale(2);
-		font.setScale(1);
-		// fontBatch.setColor( dc.font );
-		fontBatch.setColor(Color.BLUE);
-		float xbase = constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x;
-		float ybase = constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y;
-		font.draw(fontBatch, v, xbase*Gdx.graphics.getWidth(), ybase*Gdx.graphics.getHeight());
-        // font.draw(fontBatch, v, 0.4f, 0.1f);
+		DoubleColor dc = DoubleColor.FromValue(value);
+		font.setScale(2);
+		TextBounds bounds = font.getBounds(v);
+		fontBatch.setColor( dc.font );
+		float xbase = constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x + constants.tileSize/2;
+		float ybase = constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y + constants.tileSize/2;
+		font.draw(fontBatch, v, xbase*Gdx.graphics.getWidth() - bounds.width/2 , ybase*Gdx.graphics.getHeight() + bounds.height/2);
 	}
 
 	@Override
