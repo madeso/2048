@@ -124,8 +124,8 @@ class GameManager {
 		return null;
 	}
 
-	void prepareTiles() {
-	  this.grid.eachCell(
+	static void prepareTiles(Grid grid) {
+	  grid.eachCell(
 			  new CellCallBack() {
 				@Override
 				public void onCell(int x, int y, Tile tile) {
@@ -139,9 +139,9 @@ class GameManager {
 	}
 
 	// Move a tile and its representation
-	void moveTile(Tile tile, Vec cell) {
-	  this.grid.cells[tile.getX()][tile.getY()] = null;
-	  this.grid.cells[cell.getX()][cell.getY()] = tile;
+	static void moveTile(Grid grid, Tile tile, Vec cell) {
+	  grid.cells[tile.getX()][tile.getY()] = null;
+	  grid.cells[cell.getX()][cell.getY()] = tile;
 	  tile.updatePosition(cell);
 	};
 
@@ -157,12 +157,12 @@ class GameManager {
 	  Tile tile;
 	  Vec cell;
 
-	  Vec vector = this.getVector(input);
-	  Traversals traversals = this.buildTraversals(vector);
+	  Vec vector = GameManager.getVector(input);
+	  Traversals traversals = GameManager.buildTraversals(vector, this.size);
 	  boolean moved = false;
 
 	  // Save the current tile positions and remove merger information
-	  this.prepareTiles();
+	  GameManager.prepareTiles(this.grid);
 
 	  // Traverse the grid in the right direction and move tiles
 	  for(int x=0; x<traversals.x.length; ++x) {
@@ -192,7 +192,7 @@ class GameManager {
 			  // The mighty 2048 tile
 			  if (merged.getValue() == 2048) self.won = true;
 			} else {
-			  self.moveTile(tile, positions.getFarthest());
+			  GameManager.moveTile(self.grid, tile, positions.getFarthest());
 			}
 
 			if (!self.positionsEqual(cell, tile.getPosition())) {
@@ -210,9 +210,48 @@ class GameManager {
 		this.actuate();
 	  }
 	}
+	
+	public static void calcMove(Input input, Grid grid) {
+		  Tile tile;
+		  Vec cell;
+
+		  Vec vector = getVector(input);
+		  Traversals traversals = buildTraversals(vector, grid.size);
+
+		  // Save the current tile positions and remove merger information
+		  prepareTiles(grid);
+
+		  // Traverse the grid in the right direction and move tiles
+		  for(int x=0; x<traversals.x.length; ++x) {
+			  for(int y=0; y<traversals.y.length; ++y) {
+			  cell = new Vec(x, y );
+			  tile = grid.cellContent(cell);
+
+			  if (tile != null) {
+				FarthestPosition positions = GameManager.findFarthestPosition(grid, cell, vector);
+
+				Tile next = grid.cellContent(positions.getNext());
+
+				// Only one merger per row traversal?
+				if (next!=null && next.getValue() == tile.getValue() && null==next.getMergedFrom()) {
+				  Tile merged = new Tile(positions.getNext(), tile.getValue() * 2);
+				  merged.setMergedFrom(new MergedFrom(tile, next));
+
+				  grid.insertTile(merged);
+				  grid.removeTile(tile);
+
+				  // Converge the two tiles' positions
+				  tile.updatePosition(positions.getNext());
+				} else {
+				  moveTile(grid, tile, positions.getFarthest());
+				}
+			  }
+			}
+		  }
+		}
 
 	// Get the vector representing the chosen direction
-	Vec getVector(Input input) {
+	static Vec getVector(Input input) {
 	  // Vectors representing tile movement
 		if (input==Input.up) return new Vec( 0, 1); // Up
 		if (input==Input.right) return new Vec( 1, 0); // Right
@@ -222,10 +261,10 @@ class GameManager {
 	}
 
 	// Build a list of positions to traverse in the right order
-	Traversals buildTraversals(Vec vector) {
-	  Traversals traversals = new Traversals(this.size);
+	static Traversals buildTraversals(Vec vector, int size) {
+	  Traversals traversals = new Traversals(size);
 
-	  for (int pos = 0; pos < this.size; pos++) {
+	  for (int pos = 0; pos < size; pos++) {
 		  traversals.x[pos] = pos;
 		  traversals.y[pos] = pos;
 	  }
@@ -237,7 +276,7 @@ class GameManager {
 	  return traversals;
 	}
 
-	private int[] Reverse(int[] a) {
+	private static int[] Reverse(int[] a) {
 		int[] ret = new int[a.length];
 		for(int i=0; i<a.length; ++i) {
 			ret[i] = a[ a.length - (i + 1) ];
@@ -277,7 +316,7 @@ class GameManager {
 
 		  if (tile!=null) {
 			for (int direction = 0; direction < 4; direction++) {
-			  Vec vector = self.getVector(getIntDiretion(direction));
+			  Vec vector = GameManager.getVector(getIntDiretion(direction));
 			  Vec cell = new Vec(x + vector.getX(), y + vector.getY());
 
 			  Tile other = self.grid.cellContent(cell);
