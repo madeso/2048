@@ -45,6 +45,7 @@ public class Slide2048 implements ApplicationListener {
 	@Override
 	public void dispose() {
 		batch.dispose();
+		fontBatch.dispose();
 	}
 	
 	Color background = new Color(0xFAF8EFFF);
@@ -62,10 +63,11 @@ public class Slide2048 implements ApplicationListener {
 		batch.setProjectionMatrix(camera.combined);
 		// Matrix4 normalProjection = new Matrix4().setToOrtho2D(0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth()/2, -Gdx.graphics.getHeight()/2, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		/*Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth(), Gdx.graphics.getWidth(),
-				-Gdx.graphics.getHeight(), Gdx.graphics.getHeight(),
+		/*Matrix4 normalProjection = new Matrix4().setToOrtho2D(-Gdx.graphics.getWidth()/2, Gdx.graphics.getWidth()/2,
+				-Gdx.graphics.getHeight()/2, Gdx.graphics.getHeight()/2,
 				0, 1);*/
 		fontBatch.setProjectionMatrix(normalProjection);
+		// fontBatch.setProjectionMatrix(camera.combined);
 		batch.begin(ShapeType.Filled);
 		
 		constants.update(camera);
@@ -98,7 +100,6 @@ public class Slide2048 implements ApplicationListener {
 				}
 			}
 		} );
-		batch.end();
         fontBatch.end();
 		
 		float diff = 0.04f;
@@ -173,14 +174,15 @@ public class Slide2048 implements ApplicationListener {
 	
 	private void drawText(float x, float y, int value) {
 		String v = Integer.toString(value);
-		DoubleColor dc = DoubleColor.FromValue(value);
-		font.setScale(2);
-		float s = font.getScaleX();
+		// DoubleColor dc = DoubleColor.FromValue(value);
+		// font.setScale(2);
+		font.setScale(1);
 		// fontBatch.setColor( dc.font );
 		fontBatch.setColor(Color.BLUE);
 		float xbase = constants.boardx + constants.spacing + (constants.tileSize + constants.spacing)*x;
 		float ybase = constants.boardy + constants.spacing + (constants.tileSize + constants.spacing)*y;
-        font.draw(fontBatch, v, xbase*Gdx.graphics.getWidth(), ybase*Gdx.graphics.getHeight());
+		font.draw(fontBatch, v, xbase*Gdx.graphics.getWidth(), ybase*Gdx.graphics.getHeight());
+        // font.draw(fontBatch, v, 0.4f, 0.1f);
 	}
 
 	@Override

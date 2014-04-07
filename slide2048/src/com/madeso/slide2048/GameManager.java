@@ -175,7 +175,7 @@ class GameManager {
 			Tile next = self.grid.cellContent(positions.getNext());
 
 			// Only one merger per row traversal?
-			if (next!=null && next.getValue() == tile.getValue() && null!=next.getMergedFrom()) {
+			if (next!=null && next.getValue() == tile.getValue() && null==next.getMergedFrom()) {
 			  Tile merged = new Tile(positions.getNext(), tile.getValue() * 2);
 			  merged.setMergedFrom(new MergedFrom(tile, next));
 
