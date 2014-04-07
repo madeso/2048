@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Interpolation.ElasticOut;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -87,7 +88,7 @@ public class Slide2048 implements ApplicationListener {
 			@Override
 			public void onCell(int x, int y, Tile tile) {
 				if( tile != null ) {
-					drawTile(x, y, tile.getValue(), tile.getWobbleTimer() );
+					drawTile(x, y, tile.getValue(),  Elastic.easeOut(tile.getWobbleTimer(), 0,1,1) );
 				}
 			}
 		} );
