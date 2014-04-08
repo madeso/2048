@@ -122,7 +122,14 @@ class GameManager {
 	private static void RunUnitTest(int size) {
 		Grid empty = new Grid(size, null);
 		
+		Gdx.app.log("unittest", "#########################################################");
+		Gdx.app.log("unittest", "#########################################################");
+		Gdx.app.log("unittest", "#########################################################");
+		
 		Grid test = null;
+		
+		// -----------------------------------
+		// left / right
 		
 		test = empty.makeCopy();
 		AdddTile(test, 0,0,2);
@@ -172,6 +179,58 @@ class GameManager {
 		assertCellContent(test, 1,0,4);
 		assertCellContent(test, 2,0,-1);
 		assertCellContent(test, 3,0,-1);
+		endTest(test);
+		
+		// -----------------------------------
+		// up / down
+		
+		test = empty.makeCopy();
+		AdddTile(test, 0,3,2);
+		AdddTile(test, 0,2,2);
+		AdddTile(test, 0,1,2);
+		AdddTile(test, 0,0,2);
+		beginTest("Moving up 4*2", test);
+		moveLogic(Input.up, test, null, false);
+		assertCellContent(test, 0,3,4);
+		assertCellContent(test, 0,2,4);
+		assertCellContent(test, 0,1,-1);
+		assertCellContent(test, 0,0,-1);
+		endTest(test);
+		
+		test = empty.makeCopy();
+		AdddTile(test, 0,0,2);
+		beginTest("Moving up 1*2", test);
+		moveLogic(Input.up, test, null, false);
+		assertCellContent(test, 0,3,2);
+		assertCellContent(test, 0,2,-1);
+		assertCellContent(test, 0,1,-1);
+		assertCellContent(test, 0,0,-1);
+		endTest(test);
+		
+		test = empty.makeCopy();
+		AdddTile(test, 0,3,4);
+		AdddTile(test, 0,2,2);
+		AdddTile(test, 0,1,2);
+		// AdddTile(test, 0,0,2);
+		beginTest("Moving up 4+2+2", test);
+		moveLogic(Input.up, test, null, false);
+		assertCellContent(test, 0,3,4);
+		assertCellContent(test, 0,2,4);
+		assertCellContent(test, 0,1,-1);
+		assertCellContent(test, 0,0,-1);
+		endTest(test);
+		
+		test = empty.makeCopy();
+		AdddTile(test, 0,3,4);
+		AdddTile(test, 0,2,4);
+		AdddTile(test, 0,1,2);
+		// AdddTile(test, 0,0,2);
+		beginTest("Moving up 4+4+2", test);
+		moveLogic(Input.up, test, null, false);
+		assertCellContent(test, 0,3,8);
+		assertCellContent(test, 0,2,2);
+		assertCellContent(test, 0,1,-1);
+		assertCellContent(test, 0,0,-1);
 		endTest(test);
 	}
 

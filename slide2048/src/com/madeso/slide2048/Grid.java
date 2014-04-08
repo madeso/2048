@@ -147,7 +147,7 @@ class Grid {
 	}
 
 	public void log(String cat) {
-		for (int y = 0; y < this.size; y++) {
+		for (int y = this.size-1; y >= 0; y--) {
 			String out = "|";
 			for (int x = 0; x < this.size; x++) {			
 				Tile tile = this.cells[x][y];
