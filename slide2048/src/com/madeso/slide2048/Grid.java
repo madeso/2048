@@ -3,6 +3,8 @@ package com.madeso.slide2048;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.badlogic.gdx.Gdx;
+
 class Grid {
 	private static Random random = new Random();
 	int size;
@@ -142,5 +144,20 @@ class Grid {
 			}
 		}
 		return null;
+	}
+
+	public void log(String cat) {
+		for (int y = 0; y < this.size; y++) {
+			String out = "|";
+			for (int x = 0; x < this.size; x++) {			
+				Tile tile = this.cells[x][y];
+				String value = "-";
+				if( tile != null ) {
+					value = Integer.toString(tile.getValue());
+				}
+				out += String.format(" %s |", value);
+			}
+			Gdx.app.log(cat, out);
+		}
 	}
 }
