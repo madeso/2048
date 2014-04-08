@@ -233,56 +233,17 @@ class GameManager {
 			if( addRandom ) {
 				addRandomTile(grid);
 			}
-			if (!movesAvailable(grid)) {
-				self.over = true; // Game over!
+			if( self != null ) {
+				if (!movesAvailable(grid)) {
+					self.over = true; // Game over!
+				}
+				self.actuate();
 			}
-			self.actuate();
 		}
 	}
 
 	public static void calcMove(Input input, Grid grid) {
-		Tile tile;
-		Vec cell;
-
-		Vec vector = getVector(input);
-		Traversals traversals = buildTraversals(vector, grid.size);
-
-		// Save the current tile positions and remove merger information
-		prepareTiles(grid);
-
-		// Traverse the grid in the right direction and move tiles
-		for (int ix = 0; ix < traversals.x.length; ++ix) {
-			for (int iy = 0; iy < traversals.y.length; ++iy) {
-				int x = traversals.x[ix];
-				int y = traversals.x[iy];
-				cell = new Vec(x, y);
-				tile = grid.cellContent(cell);
-
-				if (tile != null) {
-					FarthestPosition positions = GameManager
-							.findFarthestPosition(grid, cell, vector);
-
-					Tile next = grid.cellContent(positions.getNext());
-
-					// Only one merger per row traversal?
-					if (next != null && next.getValue() == tile.getValue()
-							&& null == next.getMergedFrom()) {
-						Tile merged = new Tile(positions.getNext(),
-								tile.getValue() * 2);
-						merged.setMergedFrom(new MergedFrom(tile, next));
-						merged.index = next.index;
-
-						grid.insertTile(merged);
-						grid.removeTile(tile);
-
-						// Converge the two tiles' positions
-						tile.updatePosition(positions.getNext());
-					} else {
-						moveTile(grid, tile, positions.getFarthest());
-					}
-				}
-			}
-		}
+		moveLogic(input, grid, null, false);
 	}
 	
 	public void setupMovement(Input input) {
