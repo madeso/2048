@@ -96,7 +96,7 @@ class GameManager {
 
 	// Sends the updated grid to the actuator
 	void actuate() {
-		GameManager.RunUnitTest(this.grid.size);
+		// GameManager.RunUnitTest(this.grid.size);
 		if (this.storageManager.getBestScore() < this.score) {
 			this.storageManager.setBestScore(this.score);
 		}
@@ -119,6 +119,7 @@ class GameManager {
 	 * keepPlaying: this.keepPlaying }; };
 	 */
 
+	/*
 	private static void RunUnitTest(int size) {
 		Grid empty = new Grid(size, null);
 		
@@ -267,7 +268,7 @@ class GameManager {
 	private static void AdddTile(Grid g, int x, int y, int v) {
 		Tile t = new Tile(new Vec(x,y), v);
 		g.insertTile(t);
-	}
+	}*/
 
 	// Save all tile positions and remove merger info
 	private GameState serialize() {
