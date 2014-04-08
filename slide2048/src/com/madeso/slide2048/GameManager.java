@@ -79,23 +79,24 @@ class GameManager {
 	// Set up the initial tiles to start the game with
 	void addStartTiles() {
 		for (int i = 0; i < this.startTiles; i++) {
-			this.addRandomTile();
+			GameManager.addRandomTile(this.grid);
 		}
 	}
 
 	// Adds a tile in a random position
-	void addRandomTile() {
-		if (this.grid.cellsAvailable()) {
+	static void addRandomTile(Grid grid) {
+		if (grid.cellsAvailable()) {
 			int value = Math.random() < 0.9 ? 2 : 4;
-			Tile tile = new Tile(this.grid.randomAvailableCell(), value);
+			Tile tile = new Tile(grid.randomAvailableCell(), value);
 			tile.wobble();
 
-			this.grid.insertTile(tile);
+			grid.insertTile(tile);
 		}
 	}
 
 	// Sends the updated grid to the actuator
 	void actuate() {
+		GameManager.RunUnitTest(this.grid.size);
 		if (this.storageManager.getBestScore() < this.score) {
 			this.storageManager.setBestScore(this.score);
 		}
@@ -117,6 +118,20 @@ class GameManager {
 	 * this.grid.serialize(), score: this.score, over: this.over, won: this.won,
 	 * keepPlaying: this.keepPlaying }; };
 	 */
+
+	private static void RunUnitTest(int size) {
+		Grid empty = new Grid(size, null);
+		
+		Grid test = empty.makeCopy();
+		AdddTile(test, 0,0,2);
+		AdddTile(test, 1,0,2);
+		AdddTile(test, 3,0,4);
+	}
+
+	private static void AdddTile(Grid g, int x, int y, int v) {
+		Tile t = new Tile(new Vec(x,y), v);
+		g.insertTile(t);
+	}
 
 	// Save all tile positions and remove merger info
 	private GameState serialize() {
@@ -143,27 +158,28 @@ class GameManager {
 		tile.updatePosition(cell);
 	};
 
+	public void move(Input input) {
+		if (this.isGameTerminated())
+			return; // Don't do anything if the game's over
+		moveLogic(input, this.grid, this, true);
+	}
+	
 	/**
 	 * Move tiles on the grid in the specified direction.
 	 * 
 	 * @param input
 	 *            the input
 	 */
-	public void move(Input input) {
-		GameManager self = this;
-
-		if (this.isGameTerminated())
-			return; // Don't do anything if the game's over
-
+	private static void moveLogic(Input input, Grid grid, GameManager self, boolean addRandom) {
 		Tile tile;
 		Vec cell;
 
 		Vec vector = GameManager.getVector(input);
-		Traversals traversals = GameManager.buildTraversals(vector, this.size);
+		Traversals traversals = GameManager.buildTraversals(vector, grid.size);
 		boolean moved = false;
 
 		// Save the current tile positions and remove merger information
-		GameManager.prepareTiles(this.grid);
+		GameManager.prepareTiles(grid);
 
 		// Traverse the grid in the right direction and move tiles
 		for (int ix = 0; ix < traversals.x.length; ++ix) {
@@ -171,13 +187,13 @@ class GameManager {
 				int x = traversals.x[ix];
 				int y = traversals.x[iy];
 				cell = new Vec(x, y);
-				tile = self.grid.cellContent(cell);
+				tile = grid.cellContent(cell);
 
 				if (tile != null) {
 					FarthestPosition positions = GameManager
-							.findFarthestPosition(self.grid, cell, vector);
+							.findFarthestPosition(grid, cell, vector);
 
-					Tile next = self.grid.cellContent(positions.getNext());
+					Tile next = grid.cellContent(positions.getNext());
 
 					// Only one merger per row traversal?
 					if (next != null && next.getValue() == tile.getValue()
@@ -185,25 +201,28 @@ class GameManager {
 						Tile merged = new Tile(positions.getNext(),
 								tile.getValue() * 2);
 						merged.setMergedFrom(new MergedFrom(tile, next));
+						merged.index = next.index;
 
-						self.grid.insertTile(merged);
-						self.grid.removeTile(tile);
+						grid.insertTile(merged);
+						grid.removeTile(tile);
 
 						// Converge the two tiles' positions
 						tile.updatePosition(positions.getNext());
 
-						// Update the score
-						self.score += merged.getValue();
-
-						// The mighty 2048 tile
-						if (merged.getValue() == 2048)
-							self.won = true;
+						if( self != null) {
+							// Update the score
+							self.score += merged.getValue();
+	
+							// The mighty 2048 tile
+							if (merged.getValue() == 2048)
+								self.won = true;
+						}
 					} else {
-						GameManager.moveTile(self.grid, tile,
+						GameManager.moveTile(grid, tile,
 								positions.getFarthest());
 					}
 
-					if (!self.positionsEqual(cell, tile.getPosition())) {
+					if (!positionsEqual(cell, tile.getPosition())) {
 						moved = true; // The tile moved from its original cell!
 					}
 				}
@@ -211,11 +230,13 @@ class GameManager {
 		}
 
 		if (moved) {
-			this.addRandomTile();
-			if (!this.movesAvailable()) {
-				this.over = true; // Game over!
+			if( addRandom ) {
+				addRandomTile(grid);
 			}
-			this.actuate();
+			if (!movesAvailable(grid)) {
+				self.over = true; // Game over!
+			}
+			self.actuate();
 		}
 	}
 
@@ -346,19 +367,17 @@ class GameManager {
 		return new FarthestPosition(previous, cell);
 	}
 
-	boolean movesAvailable() {
-		return this.grid.cellsAvailable() || this.tileMatchesAvailable();
+	static boolean movesAvailable(Grid grid) {
+		return grid.cellsAvailable() || GameManager.tileMatchesAvailable(grid);
 	}
 
 	// Check for available matches between tiles (more expensive check)
-	boolean tileMatchesAvailable() {
-		GameManager self = this;
-
+	static boolean tileMatchesAvailable(Grid grid) {
 		Tile tile;
 
-		for (int x = 0; x < this.size; x++) {
-			for (int y = 0; y < this.size; y++) {
-				tile = this.grid.cellContent(new Vec(x, y));
+		for (int x = 0; x < grid.size; x++) {
+			for (int y = 0; y < grid.size; y++) {
+				tile = grid.cellContent(new Vec(x, y));
 
 				if (tile != null) {
 					for (int direction = 0; direction < 4; direction++) {
@@ -366,7 +385,7 @@ class GameManager {
 								.getVector(getIntDiretion(direction));
 						Vec cell = new Vec(x + vector.getX(), y + vector.getY());
 
-						Tile other = self.grid.cellContent(cell);
+						Tile other = grid.cellContent(cell);
 
 						if (other != null
 								&& other.getValue() == tile.getValue()) {
@@ -380,7 +399,7 @@ class GameManager {
 		return false;
 	}
 
-	private Input getIntDiretion(int input) {
+	private static Input getIntDiretion(int input) {
 		if (input == 0)
 			return Input.up;
 		if (input == 1)
@@ -390,7 +409,7 @@ class GameManager {
 		return Input.left;
 	}
 
-	boolean positionsEqual(Vec first, Vec second) {
+	public static boolean positionsEqual(Vec first, Vec second) {
 		return first.getX() == second.getX() && first.getY() == second.getY();
 	}
 
