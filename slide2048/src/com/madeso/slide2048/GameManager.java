@@ -321,7 +321,7 @@ class GameManager {
 		for (int ix = 0; ix < traversals.x.length; ++ix) {
 			for (int iy = 0; iy < traversals.y.length; ++iy) {
 				int x = traversals.x[ix];
-				int y = traversals.x[iy];
+				int y = traversals.y[iy];
 				cell = new Vec(x, y);
 				tile = grid.cellContent(cell);
 
