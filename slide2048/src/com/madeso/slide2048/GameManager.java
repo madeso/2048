@@ -122,10 +122,50 @@ class GameManager {
 	private static void RunUnitTest(int size) {
 		Grid empty = new Grid(size, null);
 		
-		Grid test = empty.makeCopy();
+		Grid test = null;
+		
+		beginTest("Moving right");
+		test = empty.makeCopy();
 		AdddTile(test, 0,0,2);
 		AdddTile(test, 1,0,2);
-		AdddTile(test, 3,0,4);
+		AdddTile(test, 3,0,2);
+		moveLogic(Input.right, test, null, false);
+		assertCellContent(test, 0,0,-1);
+		assertCellContent(test, 1,0,-1);
+		assertCellContent(test, 2,0,2);
+		assertCellContent(test, 3,0,4);
+		endTest();
+		
+		beginTest("Moving left");
+		test = empty.makeCopy();
+		AdddTile(test, 0,0,2);
+		AdddTile(test, 1,0,2);
+		AdddTile(test, 3,0,2);
+		moveLogic(Input.left, test, null, false);
+		assertCellContent(test, 0,0,4);
+		assertCellContent(test, 1,0,2);
+		assertCellContent(test, 2,0,-1);
+		assertCellContent(test, 3,0,-1);
+		endTest();
+	}
+
+	private static void beginTest(String string) {
+		Gdx.app.log("unittest", "*****" + string + ":");
+	}
+
+	private static void endTest() {
+		Gdx.app.log("unittest", "-------------------------------------------");
+	}
+
+	private static void assertCellContent(Grid test, int x, int y, int v) {
+		Tile t = test.cellContent(new Vec(x,y));
+		int value = -1;
+		if( t != null) value = t.getValue();
+		if( value == v ) {
+		}
+		else {
+			Gdx.app.log("unittest", String.format("Test failed: (%d,%d) should be %d but was %d!", x,y, v, value));
+		}
 	}
 
 	private static void AdddTile(Grid g, int x, int y, int v) {
