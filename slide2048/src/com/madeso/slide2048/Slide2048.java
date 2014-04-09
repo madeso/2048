@@ -88,10 +88,13 @@ public class Slide2048 implements ApplicationListener {
 			switchToInput(dir);
 			
 			if( lastInput != currentInput ) {
-				if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
-					if( gameManager.canMove(currentInput) == false ) {
-						// can't move
-						Gdx.app.log("VIBRATE", "Can't move");
+				
+				if( gameManager.isGameTerminated() == false ) {
+					if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
+						if( gameManager.canMove(currentInput) == false ) {
+							// can't move
+							Gdx.app.log("VIBRATE", "Can't move");
+						}
 					}
 				}
 			}
@@ -115,32 +118,35 @@ public class Slide2048 implements ApplicationListener {
 
 				int dir = Maths.Classify(dist.x, dist.y);
 				switchToInput(dir);
-				switch (currentInput) {
-				case tap:
-					// game.input(Game.Input.tap);
-					if (gameManager.getActuator().isGameTerminated()) {
-						gameManager.restart();
+				
+				if( gameManager.isGameTerminated() == false ) {
+					switch (currentInput) {
+					case left:
+						gameManager.move(Input.left);
+						break;
+					case right:
+						gameManager.move(Input.right);
+						break;
+					case up:
+						gameManager.move(Input.up);
+						break;
+					case down:
+						gameManager.move(Input.down);
+						break;
+					default:
+						break;
 					}
-					break;
-				case left:
-					gameManager.move(Input.left);
-					break;
-				case right:
-					gameManager.move(Input.right);
-					break;
-				case up:
-					gameManager.move(Input.up);
-					break;
-				case down:
-					gameManager.move(Input.down);
-					break;
-				default:
-					break;
+					
+					if ( gameManager.isGameTerminated() ) {
+						Gdx.app.log("VIBRATE", "Game is terminated");
+					}
+				}
+				else {
+					if ( currentInput == Input.tap ) {
+						Gdx.app.log("VIBRATE", "New game");
+					}
 				}
 				currentInput = Input.none;
-
-				if (d > 1.0f) {
-				}
 			}
 		}
 		
