@@ -60,6 +60,7 @@ public class Slide2048 implements ApplicationListener {
 	float movementData = 0.0f;
 	
 	Input currentInput = Input.none;
+	Input lastInput = Input.none;
 
 	@Override
 	public void render() {
@@ -85,6 +86,17 @@ public class Slide2048 implements ApplicationListener {
 			int dir = Maths.SubClassify(dist.x, dist.y, true);
 			
 			switchToInput(dir);
+			
+			if( lastInput != currentInput ) {
+				if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
+					if( gameManager.canMove(currentInput) == false ) {
+						// can't move
+						Gdx.app.log("VIBRATE", "Can't move");
+					}
+				}
+			}
+			
+			lastInput = currentInput;
 
 			if( currentInput != Input.tap &&  currentInput != Input.none && currentInput != Input.blocked) {
 				gameManager.setupMovement(currentInput);

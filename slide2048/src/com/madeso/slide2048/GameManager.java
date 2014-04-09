@@ -307,7 +307,7 @@ class GameManager {
 	 * @param input
 	 *            the input
 	 */
-	private static void moveLogic(Input input, Grid grid, GameManager self, boolean addRandom) {
+	private static boolean moveLogic(Input input, Grid grid, GameManager self, boolean addRandom) {
 		Tile tile;
 		Vec cell;
 
@@ -377,10 +377,17 @@ class GameManager {
 				self.actuate();
 			}
 		}
+		
+		return moved;
 	}
 
-	public static void calcMove(Input input, Grid grid) {
-		moveLogic(input, grid, null, false);
+	public static boolean calcMove(Input input, Grid grid) {
+		return moveLogic(input, grid, null, false);
+	}
+	
+	public boolean canMove(Input input) {
+		final Grid next = this.grid.makeCopy();
+		return calcMove(input, next);
 	}
 	
 	public void setupMovement(Input input) {
