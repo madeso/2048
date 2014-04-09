@@ -521,4 +521,15 @@ class GameManager {
 	public void update(float deltaTime) {
 		grid.update(deltaTime);
 	}
+
+	public void shake() {
+		this.grid.eachCell(new CellCallBack() {
+			@Override
+			public void onCell(int x, int y, Tile tile) {
+				if( tile != null ) {
+					tile.shake();
+				}
+			}
+		});
+	}
 }

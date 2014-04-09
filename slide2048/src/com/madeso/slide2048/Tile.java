@@ -1,13 +1,16 @@
 package com.madeso.slide2048;
 
+import java.util.Random;
+
 class Tile {
 	private int x;
 	private int y;
 	private Vec previousPosition;
 	private MergedFrom mergedFrom; // Tracks tiles that merged together
 	private int value;
-	private float wobbleTimer;
+	private float wobbleTimer = 1;
 	protected int index = -1;
+	float shakeTimer = 1;
 	
 	public Tile(Vec position, int value) {
 		this.x = position.getX();
@@ -16,7 +19,13 @@ class Tile {
 
 		this.previousPosition = null;
 		this.mergedFrom = null;
-		this.wobbleTimer = 1.0f;
+	}
+	
+	static Random r = new Random();
+	private float shakeWait = 0;
+	public void shake() {
+		shakeWait = 0.2f*r.nextFloat();
+		shakeTimer = 0.1f + 0.4f*r.nextFloat();
 	}
 	
 	public Tile(Vec position) {
@@ -38,6 +47,11 @@ class Tile {
 
 	public int getValue() {
 		return value;
+	}
+	
+	public float getShake() {
+		if( shakeWait > 0 ) return 1;
+		return shakeTimer;
 	}
 
 	public int getX() {
@@ -64,6 +78,14 @@ class Tile {
 	public void update(float dt) {
 		if( wobbleTimer < 1.0f ) {
 			wobbleTimer = wobbleTimer += dt;
+		}
+		if( shakeWait < 0 ) {
+			if( shakeTimer < 1.0f ) {
+				shakeTimer = shakeTimer += dt;
+			}
+		}
+		else {
+			shakeWait -= dt;
 		}
 	}
 

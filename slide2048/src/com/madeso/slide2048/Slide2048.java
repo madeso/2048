@@ -94,6 +94,8 @@ public class Slide2048 implements ApplicationListener {
 						if( gameManager.canMove(currentInput) == false ) {
 							// can't move
 							Gdx.app.log("VIBRATE", "Can't move");
+							
+							gameManager.shake();
 						}
 					}
 				}
@@ -175,7 +177,7 @@ public class Slide2048 implements ApplicationListener {
 
 		for (int x = 0; x < constants.totalTiles; ++x) {
 			for (int y = 0; y < constants.totalTiles; ++y) {
-				drawTile(x, y, 0, 1.0f, 1.0f);
+				drawTile(x, y, 0, 1.0f, 1.0f, 1);
 			}
 		}
 
@@ -192,7 +194,7 @@ public class Slide2048 implements ApplicationListener {
 						a = tile.targetAlpha;
 					}
 					drawTile(tx, ty, tile.getValue(), a, 
-							Elastic.easeOut(tile.getWobbleTimer(), 0, 1, 1));
+							Elastic.easeOut(tile.getWobbleTimer(), 0, 1, 1), tile.getShake());
 				}
 			}
 		});
@@ -276,7 +278,7 @@ public class Slide2048 implements ApplicationListener {
 		return touchPos;
 	}
 
-	private void drawTile(float x, float y, int value, float alpha, float size) {
+	private void drawTile(float x, float y, int value, float alpha, float size, float shake) {
 		DoubleColor dc = DoubleColor.FromValue(value);
 		Color c = dc.background;
 		batch.setColor(c.r, c. g, c.b, alpha);
@@ -284,11 +286,20 @@ public class Slide2048 implements ApplicationListener {
 		float s = constants.tileSize * size;
 		float s2 = s / 2 - constants.tileSize / 2;
 		
-		batch.rect(constants.boardx + constants.spacing
+		/*batch.rect(constants.boardx + constants.spacing
 				+ (constants.tileSize + constants.spacing) * x - s2,
 				constants.boardy + constants.spacing
 						+ (constants.tileSize + constants.spacing) * y - s2, s,
-				s);
+				s);*/
+		float xbase = constants.boardx + constants.spacing
+				+ (constants.tileSize + constants.spacing) * x - s2;
+		float ybase = constants.boardy + constants.spacing
+				+ (constants.tileSize + constants.spacing) * y - s2;
+		batch.rect(xbase, ybase, s,s, s/2, s/2, 20 * ShakeFunction(shake, 4));
+	}
+	
+	float ShakeFunction(float x, int times) {
+		return (float) Math.cos(Math.PI * times * 2 * x) * (1-Quart.easeIn(x, 0, 1, 1));
 	}
 
 	private void drawText(float x, float y, int value, float alpha) {
