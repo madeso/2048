@@ -58,6 +58,8 @@ public class Slide2048 implements ApplicationListener {
 	
 	boolean renderInput = false;
 	float movementData = 0.0f;
+	
+	Input currentInput = Input.none;
 
 	@Override
 	public void render() {
@@ -72,8 +74,6 @@ public class Slide2048 implements ApplicationListener {
 				touchpos = getTouchPosScreen();
 			}
 
-			Vector3 rtouchPos = new Vector3(touchpos);
-
 			Vector3 newTouchPos = getTouchPosScreen();
 			Vector3 dist = newTouchPos.sub(touchpos);
 			dist.y = -dist.y;
@@ -83,30 +83,14 @@ public class Slide2048 implements ApplicationListener {
 			float d = (float) (Math.sqrt(dist.x * dist.x + dist.y * dist.y) / 10.0f );
 
 			int dir = Maths.SubClassify(dist.x, dist.y, false);
+			
+			switchToInput(dir);
 
-			switch(dir) {
-			case 4:
-				gameManager.setupMovement(Input.left);
-				renderInput = true;
-				break;
-			case 6:
-				gameManager.setupMovement(Input.right);
-				renderInput = true;
-				break;
-			case 8:
-				gameManager.setupMovement(Input.up);
-				renderInput = true;
-				break;
-			case 2:
-				gameManager.setupMovement(Input.down);
-				renderInput = true;
-				break;
-			}
-			
-			if( renderInput ) {
+			if( currentInput != Input.none && currentInput != Input.blocked) {
+				gameManager.setupMovement(currentInput);
 				movementData = d;
+				renderInput = true;
 			}
-			
 		} else {
 			if (touchdown) {
 				touchdown = false;
@@ -118,27 +102,30 @@ public class Slide2048 implements ApplicationListener {
 				dist = dist.scl(1.0f / diff);
 
 				int dir = Maths.Classify(dist.x, dist.y);
-
-				switch (dir) {
-				case 5:
+				switchToInput(dir);
+				switch (currentInput) {
+				case tap:
 					// game.input(Game.Input.tap);
 					if (gameManager.getActuator().isGameTerminated()) {
 						gameManager.restart();
 					}
 					break;
-				case 4:
+				case left:
 					gameManager.move(Input.left);
 					break;
-				case 6:
+				case right:
 					gameManager.move(Input.right);
 					break;
-				case 8:
+				case up:
 					gameManager.move(Input.up);
 					break;
-				case 2:
+				case down:
 					gameManager.move(Input.down);
 					break;
+				default:
+					break;
 				}
+				currentInput = Input.none;
 
 				if (d > 1.0f) {
 				}
@@ -211,6 +198,40 @@ public class Slide2048 implements ApplicationListener {
 			}
 		});
 		fontBatch.end();
+	}
+
+	private void switchToInput(int dir) {
+		if( currentInput == Input.none ) {
+			if( dir == 5 ) {
+				currentInput = Input.tap;
+				return;
+			}
+		}
+		
+		if( currentInput != Input.blocked ) {
+			switch(dir) {
+			case 4:
+				currentInput = Input.left;
+				break;
+			case 5:
+				if( currentInput != Input.tap ) {
+					currentInput = Input.none;
+				}
+				break;
+			case 6:
+				currentInput = Input.right;
+				break;
+			case 8:
+				currentInput = Input.up;
+				break;
+			case 2:
+				currentInput = Input.down;
+				break;
+			default:
+				currentInput = Input.blocked;
+				break;
+			}
+		}
 	}
 
 	private Vector3 getTouchPosScreen() {
