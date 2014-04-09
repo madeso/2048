@@ -90,10 +90,14 @@ public class Slide2048 implements ApplicationListener {
 			if( lastInput != currentInput ) {
 				
 				if( gameManager.isGameTerminated() == false ) {
+					if( currentInput == Input.blocked ) {
+						Gdx.app.log("SOUND", "Input blocked");
+						Gdx.input.vibrate(500);
+					}
 					if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
 						if( gameManager.canMove(currentInput) == false ) {
 							// can't move
-							Gdx.app.log("VIBRATE", "Can't move");
+							Gdx.app.log("SOUND", "Can't move");
 							Gdx.input.vibrate(200);
 							
 							gameManager.shake();
@@ -141,15 +145,15 @@ public class Slide2048 implements ApplicationListener {
 					}
 					
 					if ( gameManager.isGameTerminated() ) {
-						Gdx.app.log("VIBRATE", "Game is terminated");
-						Gdx.input.vibrate(500);
+						Gdx.app.log("SOUND", "Game is terminated");
+						Gdx.input.vibrate(1000);
 					}
 				}
 				else {
 					if ( currentInput == Input.tap ) {
-						Gdx.app.log("VIBRATE", "New game");
+						Gdx.app.log("SOUND", "New game");
 						gameManager.restart();
-						Gdx.input.vibrate(200);
+						Gdx.input.vibrate(100);
 					}
 				}
 				currentInput = Input.none;
