@@ -82,11 +82,11 @@ public class Slide2048 implements ApplicationListener {
 			
 			float d = (float) (Math.sqrt(dist.x * dist.x + dist.y * dist.y) / 10.0f );
 
-			int dir = Maths.SubClassify(dist.x, dist.y, false);
+			int dir = Maths.SubClassify(dist.x, dist.y, true);
 			
 			switchToInput(dir);
 
-			if( currentInput != Input.none && currentInput != Input.blocked) {
+			if( currentInput != Input.tap &&  currentInput != Input.none && currentInput != Input.blocked) {
 				gameManager.setupMovement(currentInput);
 				movementData = d;
 				renderInput = true;
@@ -201,6 +201,9 @@ public class Slide2048 implements ApplicationListener {
 	}
 
 	private void switchToInput(int dir) {
+		// ignore invalid input suggestions
+		if( dir == 7 || dir == 9 || dir == 1 || dir == 3) return;
+		
 		if( currentInput == Input.none ) {
 			if( dir == 5 ) {
 				currentInput = Input.tap;
@@ -209,28 +212,42 @@ public class Slide2048 implements ApplicationListener {
 		}
 		
 		if( currentInput != Input.blocked ) {
+			Input suggestedInput = Input.none;
 			switch(dir) {
 			case 4:
-				currentInput = Input.left;
+				suggestedInput = Input.left;
 				break;
 			case 5:
-				if( currentInput != Input.tap ) {
-					currentInput = Input.none;
-				}
+				suggestedInput = Input.none;
 				break;
 			case 6:
-				currentInput = Input.right;
+				suggestedInput = Input.right;
 				break;
 			case 8:
-				currentInput = Input.up;
+				suggestedInput = Input.up;
 				break;
 			case 2:
-				currentInput = Input.down;
+				suggestedInput = Input.down;
 				break;
 			default:
-				currentInput = Input.blocked;
+				suggestedInput = Input.blocked;
 				break;
 			}
+			
+			if( currentInput == suggestedInput ) {
+				return;
+			}
+			
+			if( currentInput == Input.tap && suggestedInput == Input.none ) {
+				return;
+			}
+			
+			if( currentInput == Input.none || currentInput == Input.tap ) {
+				currentInput = suggestedInput;
+				return;
+			}
+
+			currentInput = Input.blocked;
 		}
 	}
 
