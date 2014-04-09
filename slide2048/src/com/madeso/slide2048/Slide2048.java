@@ -146,6 +146,7 @@ public class Slide2048 implements ApplicationListener {
 				else {
 					if ( currentInput == Input.tap ) {
 						Gdx.app.log("VIBRATE", "New game");
+						gameManager.restart();
 					}
 				}
 				currentInput = Input.none;
@@ -177,7 +178,7 @@ public class Slide2048 implements ApplicationListener {
 
 		for (int x = 0; x < constants.totalTiles; ++x) {
 			for (int y = 0; y < constants.totalTiles; ++y) {
-				drawTile(x, y, 0, 1.0f, 1.0f, 1);
+				drawTile(x, y, 0, 1.0f, 1.0f, 1, 0);
 			}
 		}
 
@@ -194,7 +195,7 @@ public class Slide2048 implements ApplicationListener {
 						a = tile.targetAlpha;
 					}
 					drawTile(tx, ty, tile.getValue(), a, 
-							Elastic.easeOut(tile.getWobbleTimer(), 0, 1, 1), tile.getShake());
+							Elastic.easeOut(tile.getWobbleTimer(), 0, 1, 1), tile.getShake(), tile.getShakeIntensity());
 				}
 			}
 		});
@@ -278,7 +279,7 @@ public class Slide2048 implements ApplicationListener {
 		return touchPos;
 	}
 
-	private void drawTile(float x, float y, int value, float alpha, float size, float shake) {
+	private void drawTile(float x, float y, int value, float alpha, float size, float shake, float shakeIntensity) {
 		DoubleColor dc = DoubleColor.FromValue(value);
 		Color c = dc.background;
 		batch.setColor(c.r, c. g, c.b, alpha);
@@ -295,7 +296,7 @@ public class Slide2048 implements ApplicationListener {
 				+ (constants.tileSize + constants.spacing) * x - s2;
 		float ybase = constants.boardy + constants.spacing
 				+ (constants.tileSize + constants.spacing) * y - s2;
-		batch.rect(xbase, ybase, s,s, s/2, s/2, 20 * ShakeFunction(shake, 4));
+		batch.rect(xbase, ybase, s,s, s/2, s/2, 20 * ShakeFunction(shake, 4)*shakeIntensity);
 	}
 	
 	float ShakeFunction(float x, int times) {

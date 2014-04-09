@@ -23,13 +23,21 @@ class Tile {
 	
 	static Random r = new Random();
 	private float shakeWait = 0;
+	private float shakeIntensity = 0;
 	public void shake() {
 		shakeWait = 0.2f*r.nextFloat();
+		do {
+			shakeIntensity = r.nextFloat() * ( r.nextBoolean() ? 1 : -1);
+		} while( Math.abs(shakeIntensity) < 0.25f);
 		shakeTimer = 0.1f + 0.4f*r.nextFloat();
 	}
 	
 	public Tile(Vec position) {
 		 this(position, 2);
+	}
+	
+	public float getShakeIntensity() {
+		return shakeIntensity;
 	}
 
 	public void savePosition () {
