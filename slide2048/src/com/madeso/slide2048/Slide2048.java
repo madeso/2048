@@ -2,20 +2,15 @@ package com.madeso.slide2048;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.BitmapFont.TextBounds;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Interpolation.ElasticOut;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 
@@ -27,6 +22,24 @@ public class Slide2048 implements ApplicationListener {
 	BitmapFont font;
 
 	GameManager gameManager;
+	
+	//// SOUNDS
+	private Sound sndGameTerminated;
+	private Sound sndNewGame;
+	private Sound sndInputBlocked;
+	private Sound sndCantMove;
+	
+	private Sound sndCreated;
+	private Sound sndCombine4   ;
+	private Sound sndCombine8   ;
+	private Sound sndCombine16  ;
+	private Sound sndCombine32  ;
+	private Sound sndCombine64  ;
+	private Sound sndCombine128 ;
+	private Sound sndCombine256 ;
+	private Sound sndCombine512 ;
+	private Sound sndCombine1024;
+	private Sound sndCombine2048;
 
 	@Override
 	public void create() {
@@ -41,12 +54,45 @@ public class Slide2048 implements ApplicationListener {
 		constants.update(camera);
 
 		gameManager = new GameManager(constants.totalTiles);
+		
+		sndGameTerminated= Gdx.audio.newSound(Gdx.files.internal("data/terminated.wav"));
+		sndNewGame= Gdx.audio.newSound(Gdx.files.internal("data/new-game.wav"));
+		sndInputBlocked= Gdx.audio.newSound(Gdx.files.internal("data/input-blocked.wav"));
+		sndCantMove= Gdx.audio.newSound(Gdx.files.internal("data/cant-move.wav"));
+		sndCreated     = Gdx.audio.newSound(Gdx.files.internal("data/created.wav"));
+		sndCombine4    = Gdx.audio.newSound(Gdx.files.internal("data/combine/4.wav"));
+		sndCombine8    = Gdx.audio.newSound(Gdx.files.internal("data/combine/8.wav"));
+		sndCombine16   = Gdx.audio.newSound(Gdx.files.internal("data/combine/16.wav"));
+		sndCombine32   = Gdx.audio.newSound(Gdx.files.internal("data/combine/32.wav"));
+		sndCombine64   = Gdx.audio.newSound(Gdx.files.internal("data/combine/64.wav"));
+		sndCombine128  = Gdx.audio.newSound(Gdx.files.internal("data/combine/128.wav"));
+		sndCombine256  = Gdx.audio.newSound(Gdx.files.internal("data/combine/256.wav"));
+		sndCombine512  = Gdx.audio.newSound(Gdx.files.internal("data/combine/512.wav"));
+		sndCombine1024 = Gdx.audio.newSound(Gdx.files.internal("data/combine/1024.wav"));
+		sndCombine2048 = Gdx.audio.newSound(Gdx.files.internal("data/combine/2048.wav"));
 	}
 
 	@Override
 	public void dispose() {
 		batch.dispose();
 		fontBatch.dispose();
+		
+		sndGameTerminated.dispose();
+		sndNewGame.dispose();
+		sndInputBlocked.dispose();
+		sndCantMove.dispose();
+		
+		sndCreated.dispose();
+		sndCombine4   .dispose();
+		sndCombine8   .dispose();
+		sndCombine16  .dispose();
+		sndCombine32  .dispose();
+		sndCombine64  .dispose();
+		sndCombine128 .dispose();
+		sndCombine256 .dispose();
+		sndCombine512 .dispose();
+		sndCombine1024.dispose();
+		sndCombine2048.dispose();
 	}
 
 	Color background = new Color(0xFAF8EFFF);
@@ -88,16 +134,15 @@ public class Slide2048 implements ApplicationListener {
 			switchToInput(dir);
 			
 			if( lastInput != currentInput ) {
-				
 				if( gameManager.isGameTerminated() == false ) {
 					if( currentInput == Input.blocked ) {
-						Gdx.app.log("SOUND", "Input blocked");
+						playSound(sndInputBlocked);
 						Gdx.input.vibrate(500);
 					}
 					if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
 						if( gameManager.canMove(currentInput) == false ) {
 							// can't move
-							Gdx.app.log("SOUND", "Can't move");
+							playSound(sndCantMove);
 							Gdx.input.vibrate(200);
 							
 							gameManager.shake();
@@ -127,31 +172,36 @@ public class Slide2048 implements ApplicationListener {
 				switchToInput(dir);
 				
 				if( gameManager.isGameTerminated() == false ) {
-					switch (currentInput) {
-					case left:
-						gameManager.move(Input.left);
-						break;
-					case right:
-						gameManager.move(Input.right);
-						break;
-					case up:
-						gameManager.move(Input.up);
-						break;
-					case down:
-						gameManager.move(Input.down);
-						break;
-					default:
-						break;
+					
+					int score = 0;
+					
+					if( currentInput == Input.left || currentInput == Input.right || currentInput == Input.up || currentInput == Input.down) {
+						score = gameManager.move(currentInput);
 					}
 					
 					if ( gameManager.isGameTerminated() ) {
-						Gdx.app.log("SOUND", "Game is terminated");
+						playSound(sndGameTerminated);
 						Gdx.input.vibrate(1000);
+					}
+					else {
+						Gdx.app.log("SOUND", String.format("Score: %d", score));
+						
+						if( score == 1 ) { playSound(sndCreated) ;}
+						else if( score == 4 )    { playSound(sndCombine4    );}
+						else if( score == 8 )    { playSound(sndCombine8    );}
+						else if( score == 16 )   { playSound(sndCombine16   );}
+						else if( score == 32 )   { playSound(sndCombine32   );}
+						else if( score == 64 )   { playSound(sndCombine64   );}
+						else if( score == 128 )  { playSound(sndCombine128  );}
+						else if( score == 256 )  { playSound(sndCombine256  );}
+						else if( score == 512 )  { playSound(sndCombine512  );}
+						else if( score == 1024 ) { playSound(sndCombine1024 );}
+						else if( score == 2048 ) { playSound(sndCombine2048 );}
 					}
 				}
 				else {
 					if ( currentInput == Input.tap ) {
-						Gdx.app.log("SOUND", "New game");
+						playSound(sndNewGame);
 						gameManager.restart();
 						Gdx.input.vibrate(100);
 					}
@@ -226,6 +276,11 @@ public class Slide2048 implements ApplicationListener {
 			}
 		});
 		fontBatch.end();
+	}
+
+	private void playSound(Sound snd) {
+		// TODO Auto-generated method stub
+		snd.play();
 	}
 
 	private void switchToInput(int dir) {

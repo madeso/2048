@@ -295,10 +295,10 @@ class GameManager {
 		tile.updatePosition(cell);
 	};
 
-	public void move(Input input) {
+	public int  move(Input input) {
 		if (this.isGameTerminated())
-			return; // Don't do anything if the game's over
-		moveLogic(input, this.grid, this, true);
+			return 0; // Don't do anything if the game's over
+		return moveLogic(input, this.grid, this, true);
 	}
 	
 	/**
@@ -307,13 +307,14 @@ class GameManager {
 	 * @param input
 	 *            the input
 	 */
-	private static boolean moveLogic(Input input, Grid grid, GameManager self, boolean addRandom) {
+	private static int moveLogic(Input input, Grid grid, GameManager self, boolean addRandom) {
 		Tile tile;
 		Vec cell;
 
 		Vec vector = GameManager.getVector(input);
 		Traversals traversals = GameManager.buildTraversals(vector, grid.size);
 		boolean moved = false;
+		int maxScore = 0;
 
 		// Save the current tile positions and remove merger information
 		GameManager.prepareTiles(grid);
@@ -349,6 +350,7 @@ class GameManager {
 						if( self != null) {
 							// Update the score
 							self.score += merged.getValue();
+							maxScore = Math.max(maxScore, merged.getValue());
 	
 							// The mighty 2048 tile
 							if (merged.getValue() == 2048)
@@ -378,11 +380,11 @@ class GameManager {
 			}
 		}
 		
-		return moved;
+		return Math.max(maxScore, 1);
 	}
 
 	public static boolean calcMove(Input input, Grid grid) {
-		return moveLogic(input, grid, null, false);
+		return moveLogic(input, grid, null, false) > 0;
 	}
 	
 	public boolean canMove(Input input) {
